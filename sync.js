@@ -7,7 +7,7 @@
   var BASE = String(C.url || "").replace(/\/+$/, ""), KEY = String(C.key || "");
   if (!BASE || !KEY) { window.BBSync = null; return; }
 
-  var ROW = "main", POLL = 4000, LS_META = "bb_sync_meta", LS_DIRTY = "bb_sync_dirty";
+  var ROW = C.row || "richmo", POLL = 4000, LS_META = "rm_sync_meta", LS_DIRTY = "rm_sync_dirty";
   var ver = null, base = null, dirty = false, busy = false, timer = null, started = false, pending = false;
   var q = [], inflight = [], evBusy = false, evT = null, lastLogId = null;
   var status = "connecting", statusMsg = "", lastOk = "";
@@ -72,7 +72,7 @@
     S = Object.assign({}, data, { log: lg });
     try { mig(); } catch (e) {}
     if (U) U = (S.users || []).find(function (x) { return x.id == uid; }) || null;
-    try { localStorage.setItem("bb2", JSON.stringify(S)); } catch (e) {}
+    try { localStorage.setItem("rm2", JSON.stringify(S)); } catch (e) {}
     redraw();
   }
   function adopt(row) {
