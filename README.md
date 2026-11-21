@@ -1,4 +1,4 @@
-# Richmo Manager
-Open index.html (double click). Data is saved in the browser.
-To put it on GitHub Pages: upload everything inside this folder (index.html + assets) to your repository, wait a minute, then Ctrl+F5.
-Printing: Chrome -> Print -> choose your receipt printer. For 80mm paper set Margins: None.
+# Richmo Pizzeria Manager
+Built on the Bun Bun Manager. Upload everything in this folder to the GitHub repository (index.html, sync.js, sync-config.js, config.js and the assets folder), then press Ctrl+F5.
+First login: Owner PIN 1111, Reception PIN 2222 (you must change them). Data is saved in this browser; use Staff & settings > Backup often.
+Printing: choose the receipt printer, Margins None. Receipts are cut to the 80mm roll size.
