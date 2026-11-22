@@ -425,6 +425,36 @@ body:has(.modal,.pal,.tr) #sbt{display:none!important}
 .bdg{display:inline-block;font-size:11px;padding:1px 7px;border-radius:99px;background:var(--a2);color:var(--t);margin-left:4px;white-space:nowrap}.bdg.hot{background:#fde6d8;color:#b3400f}.bdg.slow{background:#e8eaf6;color:#3a4690}tr.arch{opacity:.55}
 .card.hl{background:var(--a2)}.card.hl small{display:block;color:var(--m)}.card.hl b{display:block;font-size:19px;margin:4px 0}.card.hl em{display:block;font-style:normal;font-size:12px;color:var(--m)}
 .otabs{margin-bottom:12px}.tag.ak{font-weight:600}.tag.ak-security{background:#fde0dc;color:#a52a1f}
+
+/* ===== prettier charts ===== */
+body.enter .ln2{stroke-dasharray:none;animation:none}
+body.enter .ac svg{animation:rvl 1.1s var(--ease) both .1s}@keyframes rvl{from{clip-path:inset(-20px 100% -20px 0)}to{clip-path:inset(-20px -20px -20px 0)}}
+.ac{height:200px;margin:14px 0 4px;padding:0}
+.ac svg{overflow:visible}
+.ln2{stroke-width:3;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 6px 6px color-mix(in srgb,var(--a) 32%,transparent))}
+.gr{position:absolute;left:0;right:0;height:0;border-top:1px dashed color-mix(in srgb,var(--m) 28%,transparent);pointer-events:none}
+.gr.z{border-top:1px solid color-mix(in srgb,var(--m) 35%,transparent)}
+.gr u{position:absolute;left:0;top:-15px;text-decoration:none;font-size:10px;font-weight:600;color:var(--m);opacity:.85}
+.gr.z u{display:none}
+.cx{background:linear-gradient(var(--a),transparent);width:1.5px;opacity:0;top:6%;bottom:10%}
+.ac.hv .cx{opacity:.5}
+.dot{width:16px;height:16px;margin:-8px;border:3px solid var(--a);background:var(--c);box-shadow:0 4px 12px color-mix(in srgb,var(--a) 45%,transparent)}
+.ed{position:absolute;right:0;width:10px;height:10px;margin:-5px -5px 0 0;border-radius:50%;background:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 20%,transparent);animation:edp 2s ease-in-out infinite;pointer-events:none}
+@keyframes edp{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--a) 0%,transparent)}}
+.ac.hv .ed{opacity:0}
+.xl{position:relative;display:block;height:16px;margin-top:10px;font-size:11px;font-weight:600;color:var(--m)}
+.xl span{position:absolute;top:0;white-space:nowrap}
+#tip{border-radius:12px;padding:10px 14px;box-shadow:0 14px 34px -10px #000a}
+#tip b{font-size:13px;margin-bottom:2px}
+.bars{gap:7px;height:200px;padding:14px 2px 0}
+.bc{background:none!important;border-radius:10px}
+.bc:hover{background:var(--a2)!important}
+.bc i{max-width:30px;border:0!important;border-radius:9px 9px 4px 4px!important;min-height:4px!important;background:linear-gradient(180deg,color-mix(in srgb,var(--a) 62%,#fff),var(--a))!important;opacity:.92;transition:opacity .15s,transform .15s,filter .15s}
+.bc:hover i{opacity:1;transform:scaleX(1.12);filter:none}
+.bc i.z{background:var(--l)!important;opacity:.7}
+.bc small{font-size:10px;font-weight:600}
+.hb div{height:12px!important;border:0!important;background:var(--l)!important;border-radius:99px;overflow:hidden}
+.hb i{border:0!important;border-radius:99px!important;background:linear-gradient(90deg,color-mix(in srgb,var(--a) 50%,#fff),var(--a))!important}
 </style>
 <link rel="preload" as="image" href="assets/floor.webp"><link rel="preload" as="image" href="assets/tbl-free.webp"><link rel="preload" as="image" href="assets/tbl-busy.webp"><link rel="preload" as="image" href="assets/tbl-paid.webp"></head>
 <body><div id="splash" aria-hidden="true"><img class="sg" src="assets/bun-bite.gif" alt=""><img class="sl" src="assets/logo.png" alt=""></div><div id="app"></div><div id="toast"></div>
@@ -550,11 +580,15 @@ if(a){const r=a.getBoundingClientRect(),d=AC[a.dataset.c];if(!d)return;const n=d
 else if(t)tipAt(t.dataset.tip,e);else TIP.classList.remove("on")});
 document.addEventListener("mouseleave",()=>{TIP.classList.remove("on");if(HV){HV.classList.remove("hv");HV=null}});
 /* charts */
-bars=(v,l)=>{const m=Math.max(1,...v);return`<div class="bars">${v.map((x,i)=>`<div class="bc" data-tip="${esc(`<b>${esc(l[i])}</b>${rs(x)}`)}"><i style="height:${x/m*100}%;--i:${i}"></i><small>${esc(l[i])}</small></div>`).join("")}</div>`};
+bars=(v,l)=>{const m=Math.max(1,...v);return`<div class="bars">${v.map((x,i)=>`<div class="bc" data-tip="${esc(`<b>${esc(l[i])}</b>${rs(x)}`)}"><i class="${x?"":"z"}" style="height:${x/m*100}%;--i:${i}"></i><small>${esc(l[i])}</small></div>`).join("")}</div>`};
 hb=r=>{const m=Math.max(1,...r.map(x=>x[1]));return r.map(x=>`<div class="hb" data-tip="${esc(`<b>${esc(x[0])}</b>${esc(x[2])}`)}"><span>${esc(x[0])}</span><div><i style="width:${x[1]/m*100}%"></i></div><b>${x[2]}</b></div>`).join("")||'<p class="hint">No data yet</p>'};
-function area(v,days){const id="a"+uid(),n=v.length,m=Math.max(1,...v),y=v.map(x=>100-x/m*86-6),p="M"+y.map((b,i)=>(i/(n-1)*100).toFixed(2)+","+b.toFixed(2)).join("L");
-AC[id]={v,y,t:days.map((d,i)=>{const o=inR(d[0],d[0]).length,e=exR(d[0],d[0]);return`<b>${d[0]}</b>${rs(v[i])}<small>${o} order${o==1?"":"s"} · expenses ${rs(e)}</small>`})};
-return`<div><div class="ac" data-c="${id}"><svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--a)" stop-opacity=".35"/><stop offset="1" stop-color="var(--a)" stop-opacity="0"/></linearGradient></defs><path class="af" d="${p}L100,100L0,100Z" fill="url(#g${id})"/><path class="ln2" pathLength="1" d="${p}"/></svg><i class="cx"></i><i class="dot"></i></div><div class="xl">${days.filter((_,i)=>i%3==0).map(d=>`<span>${d[1]}</span>`).join("")}</div></div>`}
+function area(v,days){const id="a"+uid(),n=v.length,m=Math.max(1,...v),Y=x=>100-x/m*76-10,y=v.map(Y),X=i=>n>1?i/(n-1)*100:50,P=y.map((b,i)=>[X(i),b]);
+/* smooth curve that never dips below the data (monotone cubic) */
+const sm=p=>{const N=p.length;if(N<2)return"M0,"+p[0][1]+"L100,"+p[0][1];const dx=[],mm=[];for(let i=0;i<N-1;i++){dx[i]=p[i+1][0]-p[i][0];mm[i]=(p[i+1][1]-p[i][1])/dx[i]}const t=[mm[0]];for(let i=1;i<N-1;i++)t[i]=mm[i-1]*mm[i]<=0?0:(mm[i-1]+mm[i])/2;t[N-1]=mm[N-2];for(let i=0;i<N-1;i++){if(mm[i]==0){t[i]=t[i+1]=0}else{const a=t[i]/mm[i],b=t[i+1]/mm[i],h=Math.hypot(a,b);if(h>3){const q=3/h;t[i]=q*a*mm[i];t[i+1]=q*b*mm[i]}}}let d="M"+p[0][0].toFixed(2)+","+p[0][1].toFixed(2);for(let i=0;i<N-1;i++){const h=dx[i]/3;d+="C"+(p[i][0]+h).toFixed(2)+","+(p[i][1]+t[i]*h).toFixed(2)+","+(p[i+1][0]-h).toFixed(2)+","+(p[i+1][1]-t[i+1]*h).toFixed(2)+","+p[i+1][0].toFixed(2)+","+p[i+1][1].toFixed(2)}return d},p=sm(P);
+const kf=x=>x>=1e6?+(x/1e6).toFixed(1)+"M":x>=1e3?+(x/1e3).toFixed(1)+"k":Math.round(x)+"",gl=(m>1?[0,.5,1]:[0]).map(f=>`<i class="gr ${f?"":"z"}" style="top:${Y(f*m)}%"><u>${f?kf(f*m):"0"}</u></i>`).join("");
+let xl="";for(let i=n-1;i>=0;i-=3)xl=`<span style="left:${X(i)}%;transform:translateX(${i==n-1?"-100%":i==0?"0":"-50%"})">${days[i][1]}</span>`+xl;
+AC[id]={v,y,t:days.map((d,i)=>{const o=inR(d[0],d[0]).length,e=exR(d[0],d[0]);let dd=d[0];try{dd=fmtD(d[0])}catch(_){}return`<b>${dd}</b>${rs(v[i])}<small>${o} order${o==1?"":"s"} · expenses ${rs(e)}</small>`})};
+return`<div><div class="ac" data-c="${id}">${gl}<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--a)" stop-opacity=".30"/><stop offset=".7" stop-color="var(--a)" stop-opacity=".07"/><stop offset="1" stop-color="var(--a)" stop-opacity="0"/></linearGradient></defs><path class="af" d="${p}L${X(n-1)},${Y(0)}L${X(0)},${Y(0)}Z" fill="url(#g${id})"/><path class="ln2" d="${p}"/></svg><i class="cx"></i><i class="dot"></i>${v[n-1]>0?`<i class="ed" style="top:${y[n-1]}%"></i>`:""}</div><div class="xl">${xl}</div></div>`}
 function countUp(){document.querySelectorAll(".k b").forEach(b=>{const m=b.textContent.match(/^(Rs\. )?(-?[\d,]+)$/);if(!m)return;const to=+m[2].replace(/,/g,""),pre=m[1]||"",t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/900),v=Math.round(to*(1-Math.pow(1-p,3)));b.textContent=pre+v.toLocaleString("en-US");if(p<1)requestAnimationFrame(f)})(t0)})}
 /* toast with undo */
 function toast(t,undo){const e=$("#toast");e.innerHTML=esc(t)+(undo?'<button id="un2">Undo</button>':"");e.classList.add("show");if(undo)$("#un2").onclick=()=>{undo();e.classList.remove("show")};clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),undo?6000:2600)}
