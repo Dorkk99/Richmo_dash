@@ -439,9 +439,9 @@ body.enter .ac svg{animation:rvl 1.1s var(--ease) both .1s}@keyframes rvl{from{c
 .cx{background:linear-gradient(var(--a),transparent);width:1.5px;opacity:0;top:6%;bottom:10%}
 .ac.hv .cx{opacity:.5}
 .dot{width:16px;height:16px;margin:-8px;border:3px solid var(--a);background:var(--c);box-shadow:0 4px 12px color-mix(in srgb,var(--a) 45%,transparent)}
-.ed{position:absolute;right:0;width:10px;height:10px;margin:-5px -5px 0 0;border-radius:50%;background:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 20%,transparent);animation:edp 2s ease-in-out infinite;pointer-events:none}
+.enddot{position:absolute;right:0;width:10px;height:10px;margin:-5px -5px 0 0;border-radius:50%;background:var(--a);box-shadow:0 0 0 4px color-mix(in srgb,var(--a) 20%,transparent);animation:edp 2s ease-in-out infinite;pointer-events:none}
 @keyframes edp{50%{box-shadow:0 0 0 9px color-mix(in srgb,var(--a) 0%,transparent)}}
-.ac.hv .ed{opacity:0}
+.ac.hv .enddot{opacity:0}
 .xl{position:relative;display:block;height:16px;margin-top:10px;font-size:11px;font-weight:600;color:var(--m)}
 .xl span{position:absolute;top:0;white-space:nowrap}
 #tip{border-radius:12px;padding:10px 14px;box-shadow:0 14px 34px -10px #000a}
@@ -588,7 +588,7 @@ const sm=p=>{const N=p.length;if(N<2)return"M0,"+p[0][1]+"L100,"+p[0][1];const d
 const kf=x=>x>=1e6?+(x/1e6).toFixed(1)+"M":x>=1e3?+(x/1e3).toFixed(1)+"k":Math.round(x)+"",gl=(m>1?[0,.5,1]:[0]).map(f=>`<i class="gr ${f?"":"z"}" style="top:${Y(f*m)}%"><u>${f?kf(f*m):"0"}</u></i>`).join("");
 let xl="";for(let i=n-1;i>=0;i-=3)xl=`<span style="left:${X(i)}%;transform:translateX(${i==n-1?"-100%":i==0?"0":"-50%"})">${days[i][1]}</span>`+xl;
 AC[id]={v,y,t:days.map((d,i)=>{const o=inR(d[0],d[0]).length,e=exR(d[0],d[0]);let dd=d[0];try{dd=fmtD(d[0])}catch(_){}return`<b>${dd}</b>${rs(v[i])}<small>${o} order${o==1?"":"s"} · expenses ${rs(e)}</small>`})};
-return`<div><div class="ac" data-c="${id}">${gl}<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--a)" stop-opacity=".30"/><stop offset=".7" stop-color="var(--a)" stop-opacity=".07"/><stop offset="1" stop-color="var(--a)" stop-opacity="0"/></linearGradient></defs><path class="af" d="${p}L${X(n-1)},${Y(0)}L${X(0)},${Y(0)}Z" fill="url(#g${id})"/><path class="ln2" d="${p}"/></svg><i class="cx"></i><i class="dot"></i>${v[n-1]>0?`<i class="ed" style="top:${y[n-1]}%"></i>`:""}</div><div class="xl">${xl}</div></div>`}
+return`<div><div class="ac" data-c="${id}">${gl}<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="g${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--a)" stop-opacity=".30"/><stop offset=".7" stop-color="var(--a)" stop-opacity=".07"/><stop offset="1" stop-color="var(--a)" stop-opacity="0"/></linearGradient></defs><path class="af" d="${p}L${X(n-1)},${Y(0)}L${X(0)},${Y(0)}Z" fill="url(#g${id})"/><path class="ln2" d="${p}"/></svg><i class="cx"></i><i class="dot"></i>${v[n-1]>0?`<i class="enddot" style="top:${y[n-1]}%"></i>`:""}</div><div class="xl">${xl}</div></div>`}
 function countUp(){document.querySelectorAll(".k b").forEach(b=>{const m=b.textContent.match(/^(Rs\. )?(-?[\d,]+)$/);if(!m)return;const to=+m[2].replace(/,/g,""),pre=m[1]||"",t0=performance.now();(function f(t){const p=Math.min(1,(t-t0)/900),v=Math.round(to*(1-Math.pow(1-p,3)));b.textContent=pre+v.toLocaleString("en-US");if(p<1)requestAnimationFrame(f)})(t0)})}
 /* toast with undo */
 function toast(t,undo){const e=$("#toast");e.innerHTML=esc(t)+(undo?'<button id="un2">Undo</button>':"");e.classList.add("show");if(undo)$("#un2").onclick=()=>{undo();e.classList.remove("show")};clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),undo?6000:2600)}
