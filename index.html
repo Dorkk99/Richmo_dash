@@ -822,7 +822,7 @@ w:o=>o?"Here is a quick start checklist for your first day.":"Here is how a norm
 b:o=>o?[["Change the default PINs","in Staff & settings."],["Check your menu prices","in Menu."],["Set your real stock levels","in Stock."],["Place a test order","in New order, then watch it appear in Kitchen."]]:[["Open New order","and tap the items the customer wants."],["Choose the payment","then press Place order."],["Watch Kitchen and Orders","to see it move to Ready."]]}
 };
 const TR={on:false,mode:"tour",steps:[],i:0,cur:"",from:"dash"};
-const trEl=k=>k==="tools"?$(".sb .me"):k==="intro"?($(".sb .brand")||$(".sb h2")):k==="done"?null:$('#nv a[data-pg="'+k+'"]');
+const trEl=k=>{if(k==="tools")return $(".sb .me");if(k==="intro")return $(".sb .brand")||$(".sb h2");if(k==="done")return null;const a=$('#nv a[data-pg="'+k+'"]');return a&&a.classList.contains("sub")?$('#nv a.grp[data-g="'+a.dataset.g+'"]'):a};
 function trMount(){if($("#tr"))return;const d=document.createElement("div");d.id="tr";d.className="tr";d.setAttribute("role","dialog");d.setAttribute("aria-modal","true");d.setAttribute("aria-label","Bun Bun tutorial");d.innerHTML='<div class="tr-spot none"></div>';document.body.appendChild(d)}
 function trRender(){const o=$("#tr");if(!o)return;const old=$("#trc");if(old)old.remove();
 const k=TR.cur,T=TOUR[k]||{ico:"✨",t:"This section",w:"",b:[]},own=!!U&&U.role==="owner",help=TR.mode==="help",n=TR.steps.length,i=TR.i,
@@ -1617,6 +1617,120 @@ document.head.appendChild(Object.assign(document.createElement("style"),{textCon
 .rmpl{position:absolute;font-size:44px}.rmpl.a{left:10px;top:6px}.rmpl.b{right:96px;bottom:6px}.rmctr{position:absolute;right:0;top:34%;width:84px;height:170px;background:linear-gradient(135deg,#1d1b1a,#3a3836);color:#fff;border-radius:10px 0 0 10px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;letter-spacing:4px;font-size:13px}
 .rmvp{overflow:auto;border:8px solid #4a2f1b;border-radius:18px;box-shadow:inset 0 0 50px #0007,var(--sh);max-height:calc(100vh - 230px);min-height:260px;touch-action:pan-x pan-y;-webkit-overflow-scrolling:touch;background:#6b4a2a;margin:6px 0 10px}.rmvp.ed{border-color:var(--a);border-style:dashed}.rmstg{position:relative}.rmvp .rmfloor{position:absolute;left:0;top:0;transform-origin:0 0;height:auto;border:0;border-radius:0;box-shadow:none;overflow:visible;margin:0}.rmvp .rmfloor.ed{border:0}.rmt small{display:block;line-height:1.2}.rmtip{max-height:80vh;overflow:hidden}.rmtip{position:fixed;z-index:300;background:#1c1917;color:#fff;border-radius:14px;padding:12px 14px;min-width:200px;max-width:260px;box-shadow:0 12px 30px #0006;font-size:13px;pointer-events:none}.rmtip hr{border:0;border-top:1px solid #4a423c;margin:6px 0}.rmtip p{margin:4px 0;color:#cfc6bc}
 .rmbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}.rmstep{color:var(--m);font-weight:600}.rmcc.big{padding:30px 12px}.rmcc.big i{font-size:46px}.rmcc.busy{border-color:#d93636}.rmcc.paid{border-color:#14a36a}.box.rmw{width:min(780px,94vw);max-width:94vw}`}));
+/* ===== GROUPED SIDEBAR (Money, Menu & stock, Reports, Settings) + tablet & phone polish ===== */
+const RMG=[
+{id:"money",ico:"💰",t:"Money",pages:[["money","📊","Overview"],["cash","💵","Cash drawer"],["exp","💸","Expenses"],["sup","🚚","Restock"]]},
+{id:"menu",ico:"🍔",t:"Menu & stock",pages:[["menu","🍔","Menu"],["stock","📦","Stock"],["was","🗑","Wastage"],["off","🎁","Offers"]]},
+{id:"rep",ico:"📈",t:"Reports",pages:[["rep","📈","Sales reports"],["rpt","📥","Report center"],["staff","👤","Staff sales"],["aud","🧾","Audit log"]]}];
+/* daily pages first, then the grouped sections, Settings last */
+const RMORDER=["dash","pos","tbl","orders","kit","phone","uber","g:money","cus","disp","g:menu","g:rep","set"];
+const rmLast={};
+const rmIL=t=>{const x=String(t).match(/^([^\p{L}\p{N}]+?)\s+([\s\S]*)$/u);return x?[x[1].trim(),x[2]]:["",String(t)]};
+const rmLo=()=>S.stock.filter(s=>s.qty<=s.min).length;
+function rmGo(g){const G=RMG.find(x=>x.id==g);if(!G)return;const ok=G.pages.filter(p=>can(p[0]));if(!ok.length)return;const cur=ok.find(p=>p[0]==pg);pg=cur?cur[0]:ok[0][0];draw()}
+function rmNavBuild(){
+ const nv=$("#nv");if(!nv||!U)return;
+ const have=new Set([...nv.querySelectorAll("a[data-pg]")].map(a=>a.dataset.pg));
+ if(have.has("none"))return;
+ const lab=Object.fromEntries(ALLNAV),lo=rmLo(),used=new Set();let h="";
+ const flat=(k,l)=>{used.add(k);const[i,t]=rmIL(l||lab[k]||k);return`<a data-pg="${k}" title="${t}" class="${k==pg?"on":""}" onclick="pg='${k}';draw()"><span class="ni">${i}</span><span class="nl">${t}</span>${k=="stock"&&lo?`<span class="nb">${lo}</span>`:""}</a>`};
+ RMORDER.forEach(k=>{
+  if(k.slice(0,2)!="g:"){if(have.has(k))h+=flat(k,k=="set"?"⚙️ Settings":null);return}
+  const G=RMG.find(x=>x.id==k.slice(2)),ok=G.pages.filter(p=>have.has(p[0]));
+  if(!ok.length)return;
+  if(ok.length==1){h+=flat(ok[0][0]);return}
+  ok.forEach(p=>used.add(p[0]));
+  const inG=ok.some(p=>p[0]==pg);
+  h+=`<a data-g="${G.id}" title="${G.t}" class="grp ${inG?"on":""}" onclick="rmGo('${G.id}')"><span class="ni">${G.ico}</span><span class="nl">${G.t}</span>${G.id=="menu"&&lo?`<span class="nb">${lo}</span>`:""}<span class="gc">›</span></a><div class="subs" hidden>${ok.map(p=>`<a class="sub" data-g="${G.id}" data-pg="${p[0]}"></a>`).join("")}</div>`;
+ });
+ [...have].filter(k=>!used.has(k)).forEach(k=>{h+=flat(k)});
+ nv.innerHTML=h}
+function rmPageName(){const G=RMG.find(x=>x.pages.some(p=>p[0]==pg));if(pg=="set")return"Settings";if(G){const p=G.pages.find(x=>x[0]==pg);return pg=="money"?"Money":pg=="rep"?"Reports":p[2]}const l=(ALLNAV.find(x=>x[0]==pg)||[0,"Richmo"])[1];return rmIL(l)[1]}
+/* tabs inside each grouped section */
+function rmTabs(k){const G=RMG.find(x=>x.pages.some(p=>p[0]==k));if(!G)return"";const ps=G.pages.filter(p=>can(p[0]));if(ps.length<2)return"";const lo=rmLo();
+ return`<div class="gtabs" role="tablist" aria-label="${G.t}"><b class="gt">${G.ico} ${G.t}</b><div class="gts">${ps.map(p=>`<button type="button" role="tab" aria-selected="${p[0]==k}" class="${p[0]==k?"on":""}" onclick="pg='${p[0]}';draw()"><i>${p[1]}</i>${p[2]}${p[0]=="stock"&&lo?`<span class="nb">${lo}</span>`:""}</button>`).join("")}</div></div>`}
+RMG.forEach(G=>G.pages.forEach(p=>{const f=P[p[0]];if(!f)return;P[p[0]]=function(){return rmTabs(p[0])+f.apply(this,arguments)}}));
+/* Settings: quick-jump buttons to each card (the page is long on phones) */
+function rmSetJump(i){const t=(window.RMSJ||[])[i];if(!t)return;const h=[...document.querySelectorAll("main .card h3")].find(x=>x.textContent.trim()==t);const c=h&&(h.closest(".card")||h);if(c){c.scrollIntoView({behavior:"smooth",block:"start"});c.classList.add("flash2");setTimeout(()=>c.classList.remove("flash2"),1800)}}
+{const _s=P.set;P.set=function(){const h=_s.apply(this,arguments),T=[...h.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>/g)].map(m=>m[1].replace(/<[^>]*>/g,"").trim()).filter(Boolean).filter((t,i,a)=>a.indexOf(t)==i);window.RMSJ=T;
+ if(T.length<3)return h;return`<div class="gtabs"><b class="gt">⚙️ Settings</b><div class="gts">${T.map((t,i)=>`<button type="button" onclick="rmSetJump(${i})">${esc(t.length>24?t.slice(0,23)+"…":t)}</button>`).join("")}</div></div>`+h}}
+const _dg=draw;draw=function(){const r=_dg.apply(this,arguments);try{if(U){const G=RMG.find(x=>x.pages.some(p=>p[0]==pg));if(G)rmLast[G.id]=pg;rmNavBuild();rmMob();const t=$("#rmpt");if(t)t.textContent=rmPageName();const on=$(".gtabs .gts button.on");if(on){const bx=on.parentElement;bx.scrollLeft=Math.max(0,on.offsetLeft-(bx.clientWidth-on.offsetWidth)/2)}}}catch(e){console.error(e)}return r};
+/* tablets: start with the slim icon sidebar so the page gets the room */
+try{if(localStorage.getItem("rm_sb")===null&&innerWidth>900&&innerWidth<1200){document.body.classList.add("sbmin");const b=$("#sbt");if(b){b.title="Expand menu (Ctrl+B)";b.setAttribute("aria-expanded","false")}}}catch(e){}
+document.head.appendChild(Object.assign(document.createElement("style"),{textContent:`
+.gtabs{display:flex;align-items:center;gap:12px;margin:0 0 16px;min-width:0}
+.gtabs .gt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--m);white-space:nowrap;font-weight:700}
+.gtabs .gts{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;background:var(--c);border:1px solid var(--l);border-radius:14px;padding:4px;min-width:0;max-width:100%;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.gtabs .gts::-webkit-scrollbar{display:none}
+.gtabs .gts button{display:inline-flex;align-items:center;gap:7px;flex:none;white-space:nowrap;border:0;background:transparent;color:var(--m);padding:9px 14px;min-height:40px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;box-shadow:none;transform:none;scroll-snap-align:start}
+.gtabs .gts button i{font-style:normal}
+.gtabs .gts button:hover{background:var(--hv,var(--a2));color:var(--t)}
+.gtabs .gts button.on{background:var(--a);color:#fff}
+.gtabs .gts button .nb{border:0;margin-left:2px}
+.sb a .gc{margin-left:auto;opacity:.5;font-size:18px;line-height:1}.sb a.grp.on .gc{opacity:.9}.sb a .nb+.gc{margin-left:6px}
+.sb .subs[hidden]{display:none}
+body.sbmin:not(.sbpeek) .sb a .gc{display:none}
+.flash2{outline:3px solid var(--a);outline-offset:3px;border-radius:14px;transition:outline-color .4s}
+@media(max-width:900px){
+ body .sb{width:min(86vw,330px);padding:14px 12px calc(16px + env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+ body .sb h2.brand{width:140px!important;flex:none;align-self:flex-start;margin:0 0 8px!important;padding:8px 8px 4px}
+ body .sb h2.brand img{width:100%}
+ body .sb nav{flex:0 0 auto;flex-direction:column;flex-wrap:nowrap;overflow:visible;order:0;gap:2px;padding:0;width:100%}
+ body .sb nav a{width:100%;min-height:50px;padding:10px 12px;font-size:16px;border-radius:12px}
+ body .sb nav a .ni{width:34px;height:34px;font-size:17px}
+ body .sb .me{margin-top:12px;padding-top:12px}
+ body .sb .me .row{display:flex;flex-wrap:wrap;gap:8px}
+ body .sb .me button{min-height:44px;flex:1 1 auto}
+ .gtabs{margin:0 -12px 14px;padding:0 12px;position:sticky;top:48px;z-index:20;background:var(--bg);padding-top:6px;padding-bottom:6px}
+ .gtabs .gt{display:none}
+ .gtabs .gts{flex:1}
+ .rmtop{min-height:48px}
+ main .card{scroll-margin-top:116px}
+}
+@media(max-width:700px){
+ body{font-size:15px}
+ input,select,textarea{font-size:16px!important}
+ button,.chip{min-height:40px}
+ .g2,.g3{grid-template-columns:1fr!important}
+ .g4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .card.k b{font-size:22px}
+ .hd{flex-direction:column;align-items:stretch;gap:10px}.hd .row{width:100%;flex-wrap:wrap}.hd .row button{flex:1 1 auto}
+ .card{padding:14px}.sc{margin-left:0;margin-right:0;-webkit-overflow-scrolling:touch}
+ .sc table{min-width:520px}
+ .box,.box.rmw{width:96vw!important;max-width:96vw!important;max-height:92vh;border-radius:18px}
+ .modal{align-items:flex-end}
+ .modal .box{border-bottom-left-radius:0;border-bottom-right-radius:0;max-height:90vh}
+ h1{font-size:24px}
+ .row{flex-wrap:wrap}
+ .g2>*,.g3>*,.g4>*,.pos>*,main>*{min-width:0;max-width:100%}
+ .card svg,.card canvas{max-width:100%}
+ .card:has(>table){overflow-x:auto}
+}
+@media(min-width:901px) and (max-height:960px){
+ body .sb h2.brand{padding:8px 10px 4px;margin-bottom:8px}
+ body .sb h2.brand img{width:auto;max-height:92px;margin:0 auto}
+ body .sb nav a{padding-top:5px;padding-bottom:5px}
+}
+@media(min-width:901px) and (max-height:900px){
+ body.sbmin:not(.sbpeek) .sb{padding:12px 8px}
+ body.sbmin:not(.sbpeek) .sb h2.brand{height:46px;margin:0 0 8px;background-size:30px}
+ body.sbmin:not(.sbpeek) .sb nav a{padding:2px 0}
+ body.sbmin:not(.sbpeek) .sb nav a .ni{width:34px;height:34px}
+ body.sbmin:not(.sbpeek) .sb .me{padding:6px 4px}
+ body.sbmin:not(.sbpeek) .sb .me button{padding:4px 0;min-height:0}
+ body.sbmin:not(.sbpeek) .sb .me .row{gap:4px}
+}
+@media(min-width:701px) and (max-width:1100px){
+ main{padding:18px 20px 100px!important}
+ .g4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .box{max-width:min(92vw,560px)}
+}
+@media(min-width:901px) and (max-width:1200px){
+ body:not(.sbmin) .sb ~ main{margin-left:252px}
+ .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+`}));
+
 draw();
 
 </script>
