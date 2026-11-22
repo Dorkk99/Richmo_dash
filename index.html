@@ -1731,6 +1731,34 @@ body.sbmin:not(.sbpeek) .sb a .gc{display:none}
 }
 `}));
 
+/* ===== POPUPS: always on top, always closable (phone, tablet, desktop) ===== */
+const rmCloseModal=m=>{m.classList.add("out");setTimeout(()=>m.remove(),120)};
+function rmEnsureX(){document.querySelectorAll(".modal > .box").forEach(b=>{const m=b.parentElement;if(!b.querySelector(":scope>.mx")){const x=document.createElement("button");x.type="button";x.className="mx";x.setAttribute("aria-label","Close");x.textContent="✕";x.onclick=()=>m.remove();b.insertBefore(x,b.firstChild)}
+ if(!b.querySelector(":scope>.mxbar")){const f=document.createElement("div");f.className="mxbar";const c=document.createElement("button");c.type="button";c.className="mxb";c.textContent="✕  Close";c.onclick=()=>m.remove();f.appendChild(c);b.appendChild(f)}})}
+{let q=0;const run=()=>{q=0;try{rmEnsureX();if(document.querySelector(".modal")&&document.body.classList.contains("rmnav"))document.body.classList.remove("rmnav")}catch(e){}};
+ new MutationObserver(()=>{if(!q)q=requestAnimationFrame(run)}).observe(document.body,{childList:true,subtree:true})}
+addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(document.querySelector("#pal,#tr,.tr,#cbm"))return;const m=[...document.querySelectorAll(".modal")].pop();if(m){e.preventDefault();m.remove()}},true);
+document.head.appendChild(Object.assign(document.createElement("style"),{textContent:`
+.modal{z-index:150!important;padding:max(10px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom));overscroll-behavior:contain}
+.pal{z-index:160!important}#toast{z-index:400!important}
+body:has(.modal){overflow:hidden}
+.modal .box{position:relative;max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.modal .box>.mx{position:sticky;top:0;z-index:6;display:grid;place-items:center;width:40px;height:40px;margin:-8px -8px -32px auto;padding:0;border-radius:50%;border:1px solid var(--l);background:var(--c);color:var(--t);font-size:17px;line-height:1;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.modal .box>.mx:hover{background:var(--a);color:#fff;border-color:var(--a)}
+.modal .box>.mx~h3:first-of-type,.modal .box>.mx+h3{padding-right:44px}
+.modal .box>.mxbar{display:none}
+@media(max-width:900px){
+ .modal{align-items:flex-end;padding:0}
+ .modal .box,.modal .box.rmw{width:100%!important;max-width:100%!important;max-height:92vh;max-height:92dvh;border-radius:20px 20px 0 0;padding-bottom:0;animation:rmsheet .25s ease both}
+ .modal .box>.mx{width:44px;height:44px;margin:-6px -6px -36px auto;font-size:19px}
+ .modal .box>.mxbar{display:block;position:sticky;bottom:0;z-index:6;margin:14px -22px 0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--c);border-top:1px solid var(--l)}
+ .modal .box>.mxbar .mxb{width:100%;min-height:50px;font-size:16px;font-weight:700;border-radius:14px;background:var(--a2,#eee);color:var(--t);border:1px solid var(--l);cursor:pointer}
+ .modal .box button,.modal .box .chip{min-height:44px}
+}
+@keyframes rmsheet{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+@media(min-width:901px) and (max-height:760px){.modal .box{max-height:calc(100vh - 16px)}}
+`}));
+
 draw();
 
 </script>
